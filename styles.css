@@ -417,11 +417,16 @@ details[open] summary {
 
 @media (max-width: 900px) {
   .comparison-wrap {
-    padding: 24px;
+    padding: 24px 20px;
+    overflow-x: auto;
+  }
+
+  .comparison-table {
+    min-width: 550px;
   }
 
   .comparison-table .row {
-    grid-template-columns: 1fr 0.5fr 0.5fr 0.5fr;
+    grid-template-columns: 1.4fr 0.6fr 0.6fr 0.8fr;
     font-size: 13px;
   }
 }
