@@ -1072,6 +1072,17 @@
   <script src="main.js"></script>
   <script type="module" src="https://unpkg.com/ionicons@7.2.1/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.2.1/dist/ionicons/ionicons.js"></script>
+  <script>
+    // Fix for comparison table scroll position issue on resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 900) {
+        const tableWrap = document.querySelector('.comparison-wrap');
+        if (tableWrap) {
+          tableWrap.scrollLeft = 0;
+        }
+      }
+    });
+  </script>
 </body>
 
 </html>
