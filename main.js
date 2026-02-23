@@ -59,10 +59,47 @@ if (ingredientsTrack && arrowLeft && arrowRight) {
     return card.offsetWidth + gap;
   };
 
-  // Pause on card hover
-  ingredientsTrack.querySelectorAll('.ingredient-card').forEach(card => {
+  // Pause on card hover/click
+  const cards = ingredientsTrack.querySelectorAll('.ingredient-card');
+
+  const updatePauseState = () => {
+    const hasActiveCard = Array.from(cards).some(c => c.classList.contains('is-active'));
+    isPaused = hasActiveCard; // This will stop auto-scroll in the tick loop
+  };
+
+  cards.forEach(card => {
     card.addEventListener('mouseenter', () => { isPaused = true; });
-    card.addEventListener('mouseleave', () => { isPaused = false; });
+    card.addEventListener('mouseleave', () => {
+      const hasActiveCard = Array.from(cards).some(c => c.classList.contains('is-active'));
+      if (!hasActiveCard) isPaused = false;
+    });
+
+    card.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent document click from firing immediately
+      const wasActive = card.classList.contains('is-active');
+
+      // Remove active from all others
+      cards.forEach(c => c.classList.remove('is-active'));
+
+      // Toggle current
+      if (!wasActive) {
+        card.classList.add('is-active');
+      }
+
+      updatePauseState();
+    });
+  });
+
+  // Close active card when clicking outside
+  document.addEventListener('click', () => {
+    let changed = false;
+    cards.forEach(c => {
+      if (c.classList.contains('is-active')) {
+        c.classList.remove('is-active');
+        changed = true;
+      }
+    });
+    if (changed) updatePauseState();
   });
 
   // Arrow click handlers

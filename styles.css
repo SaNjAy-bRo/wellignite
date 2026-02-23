@@ -347,7 +347,8 @@ details[open] summary {
   cursor: pointer;
 }
 
-.ingredient-card:hover {
+.ingredient-card:hover,
+.ingredient-card.is-active {
   transform: translateY(-24px) scale(1.1);
   background: linear-gradient(145deg, #2f3b22, #4a6336);
   border-color: rgba(184, 214, 105, 0.35);
@@ -356,24 +357,36 @@ details[open] summary {
   color: #f1f3de;
 }
 
-.ingredient-card:hover h3 {
+@media (max-width: 768px) {
+  .ingredient-card.is-active {
+    transform: translateY(-30px) scale(1.15);
+    z-index: 30;
+  }
+}
+
+.ingredient-card:hover h3,
+.ingredient-card.is-active h3 {
   color: #fff;
 }
 
-.ingredient-card:hover p {
+.ingredient-card:hover p,
+.ingredient-card.is-active p {
   color: rgba(241, 243, 222, 0.85);
 }
 
-.ingredient-card:hover .pill {
+.ingredient-card:hover .pill,
+.ingredient-card.is-active .pill {
   background: rgba(255, 255, 255, 0.2);
   color: #f1f3de;
 }
 
-.ingredient-card:hover .label {
+.ingredient-card:hover .label,
+.ingredient-card.is-active .label {
   color: rgba(184, 214, 105, 0.9);
 }
 
-.ingredient-card:hover .ingredient-img {
+.ingredient-card:hover .ingredient-img,
+.ingredient-card.is-active .ingredient-img {
   filter: grayscale(0) contrast(1.05) brightness(1.1);
   transform: scale(1.08);
 }
