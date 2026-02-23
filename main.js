@@ -75,15 +75,26 @@ if (ingredientsTrack && arrowLeft && arrowRight) {
     });
 
     card.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent document click from firing immediately
+      e.stopPropagation();
       const wasActive = card.classList.contains('is-active');
 
       // Remove active from all others
       cards.forEach(c => c.classList.remove('is-active'));
 
-      // Toggle current
+      // Toggle current + Center card
       if (!wasActive) {
         card.classList.add('is-active');
+
+        // Calculate the centering offset
+        const viewportWidth = ingredientsTrack.parentElement.offsetWidth;
+        const cardWidth = card.offsetWidth;
+        const cardOffsetTrack = card.offsetLeft;
+        const targetPos = (viewportWidth / 2) - (cardOffsetTrack + cardWidth / 2);
+
+        // Use existing animation logic to slide to centered target
+        remaining = Math.abs(targetPos - position);
+        arrowDir = targetPos > position ? 1 : -1;
+        if (resumeTimer) clearTimeout(resumeTimer);
       }
 
       updatePauseState();
