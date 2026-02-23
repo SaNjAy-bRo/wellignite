@@ -36,23 +36,75 @@ if (packSelector && heroPrice) {
   });
 }
 
-// Auto-scroll ingredient cards
-const scrollContainer = document.querySelector(".ingredients-scroll.auto-scroll");
-if (scrollContainer) {
+// Ingredients carousel — JS-driven auto-scroll + arrows + hover pause
+const ingredientsTrack = document.querySelector('.ingredients-track');
+const arrowLeft = document.querySelector('.carousel-arrow--left');
+const arrowRight = document.querySelector('.carousel-arrow--right');
+
+if (ingredientsTrack && arrowLeft && arrowRight) {
+  let position = 0;
   let isPaused = false;
+  const AUTO_SPEED = 0.6;     // auto-scroll: pixels per frame
+  const ARROW_SPEED = 8;      // arrow slide: fixed pixels per frame (never changes)
+  let remaining = 0;          // pixels left to travel for arrow animation
+  let arrowDir = 0;           // -1 or +1
+  let resumeTimer = null;
 
-  scrollContainer.addEventListener("mouseenter", () => (isPaused = true));
-  scrollContainer.addEventListener("mouseleave", () => (isPaused = false));
+  const getHalfWidth = () => ingredientsTrack.scrollWidth / 2;
 
-  const step = () => {
-    if (!isPaused) {
-      scrollContainer.scrollLeft += 1;
-      if (scrollContainer.scrollLeft + scrollContainer.clientWidth >= scrollContainer.scrollWidth - 2) {
-        scrollContainer.scrollLeft = 0;
-      }
-    }
-    requestAnimationFrame(step);
+  const getCardStep = () => {
+    const card = ingredientsTrack.querySelector('.ingredient-card');
+    if (!card) return 320;
+    const gap = parseFloat(getComputedStyle(ingredientsTrack).gap) || 32;
+    return card.offsetWidth + gap;
   };
 
-  requestAnimationFrame(step);
+  // Pause on card hover
+  ingredientsTrack.querySelectorAll('.ingredient-card').forEach(card => {
+    card.addEventListener('mouseenter', () => { isPaused = true; });
+    card.addEventListener('mouseleave', () => { isPaused = false; });
+  });
+
+  // Arrow click handlers
+  arrowLeft.addEventListener('click', () => {
+    remaining += getCardStep();  // accumulate if clicked again
+    arrowDir = 1;                // move track right (scroll left)
+    if (resumeTimer) clearTimeout(resumeTimer);
+  });
+
+  arrowRight.addEventListener('click', () => {
+    remaining += getCardStep();  // accumulate if clicked again
+    arrowDir = -1;               // move track left (scroll right)
+    if (resumeTimer) clearTimeout(resumeTimer);
+  });
+
+  // Single animation loop
+  const tick = () => {
+    const halfW = getHalfWidth();
+
+    if (remaining > 0) {
+      // Arrow slide: move at constant fixed speed
+      const step = Math.min(ARROW_SPEED, remaining);
+      position += step * arrowDir;
+      remaining -= step;
+
+      // When arrow slide finishes, wait 1.5s then resume auto-scroll
+      if (remaining <= 0) {
+        remaining = 0;
+        resumeTimer = setTimeout(() => { resumeTimer = null; }, 1500);
+      }
+    } else if (!isPaused && !resumeTimer) {
+      // Normal auto-scroll at constant speed
+      position -= AUTO_SPEED;
+    }
+
+    // Seamless loop
+    if (position <= -halfW) position += halfW;
+    if (position > 0) position -= halfW;
+
+    ingredientsTrack.style.transform = `translateX(${position}px)`;
+    requestAnimationFrame(tick);
+  };
+
+  requestAnimationFrame(tick);
 }
